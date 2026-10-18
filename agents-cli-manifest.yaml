@@ -1,0 +1,17 @@
+name: gcp-adk-research-agents
+acli_version: 1.7.0
+agent_directory: research_agent
+region: us-central1
+base_template: adk
+generated_at: '2026-10-17T15:21:16.450981+00:00'
+language: python
+framework: google-adk
+create_params:
+  root_agent_name: gcp_adk_research_agents
+  deployment_target: agent_runtime
+  cicd_runner: skip
+  is_a2a: true
+  agent_gateway: false
+  agent_guidance_filename: AGENTS.md
+  base_template: adk
+  agent_directory: research_agent
