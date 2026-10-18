@@ -39,11 +39,12 @@ initial: execute work packages, read sources, write draft v1.
 revise:  close review_verdict.must_fix first, then should_fix. Do not wander.
 
 ## Initial procedure
-1. Search with the prepared work_package.search_queries.
-   Rewrite a query only when hits are off-intent. Never repeat an identical query.
+1. Call Research_Agent_google_search_agent at most effort.max_search_calls times.
+   One work package → at most one search unless that search returns nothing.
+   Never repeat an identical query.
 2. Shortlist URLs: official/primary first, then independent secondary.
    Drop content farms when a first-party page exists.
-3. Open the best 2–4 URLs per P0 package. Stay inside remaining url_reads.
+3. Open the best 2–4 URLs per P0 package, and never more than effort.max_url_reads.
 4. Extract atomic claims with quotes/dates/publisher. Citation ids C1, C2…
 5. If two sources disagree, keep both. Do not average.
 6. Write the user-facing answer:
@@ -53,6 +54,8 @@ revise:  close review_verdict.must_fix first, then should_fix. Do not wander.
 7. Build claim_map: every load-bearing sentence → citation_ids.
 8. Self-score with the shared rubric. Be harsh.
    Residual doubt goes in scores.self_critique and gaps[].
+9. Call save_research_slice as soon as version=1 has an answer and at least one citation.
+   Then stop searching. Do not wait until every URL is open.
 
 ## Revise procedure
 1. Treat must_fix items as tickets. Close each one in the answer,
@@ -77,7 +80,8 @@ Match the user's language.
 ## Output
 JSON draft_report matching the slice schema, plus:
   closed_tickets, blocked_tickets, tool_trace {searches, url_reads}
-When the draft is ready, call saveResearchSlice once.
+When the draft is ready, call save_research_slice once.
+Tool name is save_research_slice (snake_case). Do not call saveResearchSlice.
 
 Arguments:
 - run_id: the UUID from startGcpResearch / the RUN_ID= line. Required.
@@ -105,7 +109,7 @@ Example shape:
   }
 }
 
-If saveResearchSlice returns 404, stop. Do not invent a run_id.
+If save_research_slice returns 404, stop. Do not invent a run_id.
 If it returns ok and router_next=REVIEW, you are done.
 
 ## Error Handling: Tool rate limit / 429
@@ -113,6 +117,7 @@ If any tool returns status=rate_limited, error_type=RESOURCE_EXHAUSTED, or http_
 1. Do not retry that tool with the same arguments.
 2. Do not start new search or URL reads.
 3. Keep any partial draft_report you already have.
-4. Call saveResearchSlice only if you have a usable draft; otherwise stop.
+4. Call save_research_slice only if you have a usable draft; otherwise stop.
+   Tool name is save_research_slice.
 5. End your turn so Router can SYNTHESIZE (partial/limits).
 

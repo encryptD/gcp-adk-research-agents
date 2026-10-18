@@ -74,7 +74,9 @@ JSON review_verdict:
   stop_reason when continue_loop is false:
     clean | good_enough | blocked_gap | max_loops_implied
 
-Then save_research_slice("review_verdict", review_verdict).
+Then call save_research_slice with slice_name="review_verdict"
+and payload=<the verdict object>.
+Tool name is save_research_slice (snake_case), not saveResearchSlice.
 
 ## Error Handling: Tool rate limit / 429
 If URL/MCP tools return status=rate_limited or http_status=429:
